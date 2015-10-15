@@ -93,7 +93,8 @@ class Analyzer(Thread):
                 unpacker.feed(raw_series)
                 timeseries = list(unpacker)
 
-                anomalous, ensemble, datapoint = run_selected_algorithm(timeseries, metric_name)
+                anomalous = False
+                #anomalous, ensemble, datapoint = run_selected_algorithm(timeseries, metric_name)
 
                 # If it's anomalous, add it to list
                 if anomalous:
@@ -213,7 +214,7 @@ class Analyzer(Thread):
                 anomalous_metrics.sort(key=operator.itemgetter(1))
                 fh.write('handle_data(%s)' % anomalous_metrics)
             """
-            
+
             # Log progress
             logger.info('seconds to run    :: %.2f' % (time() - now))
             logger.info('total metrics     :: %d' % len(unique_metrics))
