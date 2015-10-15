@@ -199,7 +199,7 @@ class Analyzer(Thread):
                 for alert in settings.ALERTS:
                     for metric in self.anomalous_metrics:
                         for a in alert[0]:
-                            logger.info("Checking if %s is in %s" % (a, metric[1]))
+                            #logger.info("Checking if %s is in %s" % (a, metric[1]))
                             if a in metric[1]:
                                 cache_key = 'last_alert.%s.%s' % (alert[1], metric[1])
                                 try:
