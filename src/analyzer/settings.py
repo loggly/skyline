@@ -98,9 +98,9 @@ ALGORITHMS = [
     #'stddev_from_moving_average',
     #'least_squares',
     #'grubbs',
-    'histogram_bins',
+    #'histogram_bins',
     #'median_absolute_deviation',
-    'ks_test',
+    #'ks_test',
 ]
 
 # This is the number of algorithms that must return True before a metric is
