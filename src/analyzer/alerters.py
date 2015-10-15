@@ -6,7 +6,10 @@ import urllib2
 import simplejson
 import alerters
 import settings
+import logging
 
+
+logger = logging.getLogger("AlerterLog")
 
 """
 Create any alerter you want here. The function will be invoked from trigger_alert.
@@ -91,6 +94,7 @@ def alert_hipchat(alert, metric):
 
 
 def trigger_alert(alert, metric):
+    logger.info("Triggering alert with %s for %s" % (alert, metric))
 
     if '@' in alert[1]:
         strategy = 'alert_smtp'
