@@ -193,26 +193,25 @@ class Analyzer(Thread):
             if settings.ENABLE_ALERTS:
                 for alert in settings.ALERTS:
                     for metric in self.anomalous_metrics:
-                        if alert[0] in metric[1]:
-                            cache_key = 'last_alert.%s.%s' % (alert[1], metric[1])
-                            try:
-                                last_alert = self.redis_conn.get(cache_key)
-                                if not last_alert:
-                                    self.redis_conn.setex(cache_key, alert[2], packb(metric[0]))
-                                    trigger_alert(alert, metric)
+                        for a in alert[0]:
+                            if a in metric[1]:
+                                cache_key = 'last_alert.%s.%s' % (alert[1], metric[1])
+                                try:
+                                    last_alert = self.redis_conn.get(cache_key)
+                                    if not last_alert:
+                                        self.redis_conn.setex(cache_key, alert[2], packb(metric[0]))
+                                        trigger_alert(alert, metric)
 
-                            except Exception as e:
-                                logger.error("couldn't send alert: %s" % e)
+                                except Exception as e:
+                                    logger.error("couldn't send alert: %s" % e)
 
             # Write anomalous_metrics to static webapp directory
-            """
             filename = path.abspath(path.join(path.dirname(__file__), '..', settings.ANOMALY_DUMP))
             with open(filename, 'w') as fh:
                 # Make it JSONP with a handle_data() function
                 anomalous_metrics = list(self.anomalous_metrics)
                 anomalous_metrics.sort(key=operator.itemgetter(1))
                 fh.write('handle_data(%s)' % anomalous_metrics)
-            """
 
             # Log progress
             logger.info('seconds to run    :: %.2f' % (time() - now))
