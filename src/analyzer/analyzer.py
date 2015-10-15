@@ -207,7 +207,8 @@ class Analyzer(Thread):
                                 try:
                                     last_alert = self.redis_conn.get(cache_key)
                                     if not last_alert:
-                                        logger.info("Triggering alert")
+                                        logger.info("Triggering alert %s for metric %s" % (alert,
+                                                                                        metric[1]))
                                         self.redis_conn.setex(cache_key, alert[2], packb(metric[0]))
                                         trigger_alert(alert, metric)
 
