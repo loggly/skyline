@@ -1,4 +1,6 @@
 #!/bin/bash
+
+PYTHONPATH=/home/mauricio/anaconda/bin:$PATH
 #
 # This is used to start/stop the analyzer
 

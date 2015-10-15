@@ -1,3 +1,5 @@
+#! /usr/bin/env python
+
 import logging
 from Queue import Empty
 from redis import StrictRedis
