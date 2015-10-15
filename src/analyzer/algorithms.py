@@ -287,7 +287,7 @@ def run_selected_algorithm(timeseries, metric_name):
         raise Boring()
 
     try:
-
+        print ALGORITHMS
         ensemble = [globals()[algorithm](timeseries) for algorithm in ALGORITHMS]
 
         threshold = len(ensemble) - CONSENSUS
