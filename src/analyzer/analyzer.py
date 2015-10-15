@@ -96,7 +96,10 @@ class Analyzer(Thread):
 
                 anomalous, ensemble, datapoint, t = run_selected_algorithm(timeseries, metric_name)
 
-                logger.info("Anomalous: %s Threshold: %d" % (anomalous, t))
+                logger.info("Anomalous: %s Ensemble: %s Datapoint: %s Threshold: %d" % (anomalous,
+                                                                                        ensemble,
+                                                                                        datapoint,
+                                                                                        t))
                 # If it's anomalous, add it to list
                 if anomalous:
                     base_name = metric_name.replace(settings.FULL_NAMESPACE, '', 1)
