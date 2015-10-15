@@ -61,7 +61,8 @@ class Analyzer(Thread):
         Assign a bunch of metrics for a process to analyze.
         """
         # Discover assigned metrics
-        keys_per_processor = int(ceil(float(len(unique_metrics)) / float(settings.ANALYZER_PROCESSES)))
+        keys_per_processor = int(ceil(float(len(unique_metrics)) /
+                                      float(settings.ANALYZER_PROCESSES)))
         if i == settings.ANALYZER_PROCESSES:
             assigned_max = len(unique_metrics)
         else:
@@ -93,8 +94,9 @@ class Analyzer(Thread):
                 unpacker.feed(raw_series)
                 timeseries = list(unpacker)
 
-                anomalous, ensemble, datapoint = run_selected_algorithm(timeseries, metric_name)
+                anomalous, ensemble, datapoint, t = run_selected_algorithm(timeseries, metric_name)
 
+                logger.info("Anomalous: %s Threshold: %d" % (anomalous, t))
                 # If it's anomalous, add it to list
                 if anomalous:
                     base_name = metric_name.replace(settings.FULL_NAMESPACE, '', 1)

@@ -294,11 +294,11 @@ def run_selected_algorithm(timeseries, metric_name):
         if ensemble.count(False) <= threshold:
             if ENABLE_SECOND_ORDER:
                 if is_anomalously_anomalous(metric_name, ensemble, timeseries[-1][1]):
-                    return True, ensemble, timeseries[-1][1]
+                    return True, ensemble, timeseries[-1][1], threshold
             else:
-                return True, ensemble, timeseries[-1][1]
+                return True, ensemble, timeseries[-1][1], threshold
 
-        return False, ensemble, timeseries[-1][1]
+        return False, ensemble, timeseries[-1][1], threshold
 
     except:
         logging.error("Algorithm error: " + traceback.format_exc())
