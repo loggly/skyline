@@ -8,6 +8,7 @@ import alerters
 import settings
 import logging
 import re
+import datetime
 
 logger = logging.getLogger("AnalyzerLog")
 
@@ -52,16 +53,20 @@ def dot_to_json(a):
         target[path[-1]] = value
     return output
 
+def parse_metric_name(metric_name):
+    m = re.match('id.(\d*)\.(.*)', metric[1])
+    id = m.group(1)
+    name = m.group(2)
+    return id, name
+
 def alert_loggly(alert, metric):
 
     """ Logs a JSON object to Loggly """
     loggly_key = settings.LOGGLY_OPTS['auth_token']
     tag = settings.LOGGLY_OPTS['tag']
-
-    m = re.match('id.(\d*)\.(.*)', metric[1])
-    id = m.group(1)
-    name = m.group(2)
+    id, name = parse_metric_name(metric[1])
     value = metric[0]
+
     msg = {
         "id": id,
         "matched_substring":alert[0],
@@ -119,14 +124,23 @@ def alert_hipchat(alert, metric):
     import hipchat
     hipster = hipchat.HipChat(token=settings.HIPCHAT_OPTS['auth_token'])
     rooms = settings.HIPCHAT_OPTS['rooms'][alert[0]]
-    link = settings.GRAPH_URL % (metric[1])
+
+    now = datetime.datetime.utcnow()
+    date_from = now - datetime.timedelta(seconds=50*60)
+    date_until = now + datetime.timedelta(seconds=10*60)
+
+    id, name = parse_metric_name(metric[1])
+    value = metric[0]
+    name = "json.%s" % name
+
+    link = settings.GRAPH_URL % (id, name, date_from.isoformat(), date_until.isoformat())
 
     for room in rooms:
         hipster.method('rooms/message', method='POST',
                        parameters={'room_id': room, 'from': 'Skyline',
                                    'color': settings.HIPCHAT_OPTS['color'],
                                    'message': 'Anomaly: <a href="%s">%s</a> : %s' % (
-                                       link, metric[1], metric[0])})
+                                       link, name, value)})
 
 
 def trigger_alert(alert, metric):
