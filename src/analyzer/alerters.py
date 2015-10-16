@@ -39,7 +39,7 @@ def alert_loggly(alert, metric):
 
     log_data = "PLAINTEXT=" + urllib2.quote(simplejson.dumps(msg))
 
-    uri = "https://logs-01.loggly.com/inputs/%s/%s/" % (loggly_key, tag)
+    uri = "https://logs-01.loggly.com/inputs/%s/tag/%s/" % (loggly_key, tag)
     logger.info("Sending to Loggly with\nURI: %s \nand data:%s" % (uri,log_data))
 
     # Send log data to Loggly
