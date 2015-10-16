@@ -7,7 +7,7 @@ import simplejson
 import alerters
 import settings
 import logging
-
+import re
 
 logger = logging.getLogger("AnalyzerLog")
 
@@ -29,9 +29,14 @@ def alert_loggly(alert, metric):
     """ Logs a JSON object to Loggly """
     loggly_key = settings.LOGGLY_OPTS['auth_token']
     tag = settings.LOGGLY_OPTS['tag']
+
+    m = re.match('id.(\d*)\.(.*)', metric[1])
+    id = m.group(1)
+    name = m.group(2)
+    value = metric[0]
     msg = {
-        "value": metric[0],
-        "anomalous_metric": metric[1],
+        name: value,
+        "id": id,
         "matched_substring":alert[0],
         "strategy_used":alert[1],
         "next_alert_in_sec":alert[2],
