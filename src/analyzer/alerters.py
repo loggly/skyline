@@ -54,7 +54,7 @@ def dot_to_json(a):
     return output
 
 def parse_metric_name(metric_name):
-    m = re.match('id.(\d*)\.(.*)', metric[1])
+    m = re.match('id.(\d*)\.(.*)', metric_name)
     id = m.group(1)
     name = m.group(2)
     return id, name
