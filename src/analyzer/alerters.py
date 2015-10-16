@@ -133,7 +133,12 @@ def alert_hipchat(alert, metric):
     value = metric[0]
     name = "json.%s" % name
 
-    link = settings.GRAPH_URL % (id, name, date_from.isoformat(), date_until.isoformat())
+    url_params = urllib2.quote(settings.GRAPH_URL % (
+                                        id, name,
+                                        date_from.isoformat(),
+                                        date_until.isoformat()))
+    
+    link = 'http://' + settings.LOGGLY_HOST + url_params
 
     for room in rooms:
         hipster.method('rooms/message', method='POST',
