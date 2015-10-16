@@ -9,7 +9,7 @@ import settings
 import logging
 
 
-logger = logging.getLogger("AlerterLog")
+#logger = logging.getLogger("AlerterLog")
 
 """
 Create any alerter you want here. The function will be invoked from trigger_alert.
