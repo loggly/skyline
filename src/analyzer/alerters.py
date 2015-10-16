@@ -146,8 +146,9 @@ def alert_hipchat(alert, metric):
         hipster.method('rooms/message', method='POST',
                        parameters={'room_id': room, 'from': 'Skyline',
                                    'color': settings.HIPCHAT_OPTS['color'],
-                                   'message': 'Anomaly: <a href="%s">%s</a> : %s' % (
-                                       link, name, value)})
+                                   'message': 'Anomaly: %s: %s <BR>'
+                                              'Link: %s' % (
+                                              name, value, link)})
 
 
 def trigger_alert(alert, metric):
