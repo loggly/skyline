@@ -24,6 +24,34 @@ metric: information about the anomaly itself
     metric[1]: The full name of the anomalous metric
 """
 
+def dot_to_json(a):
+    """
+    Takes in a dictionary whose keys are in dot notation
+    and returns another dictionary with keys as a JSON tree
+    For example, it takes in: {'json.message.status.time':50, 'json.message.code.response':80, 'json.time':100}
+    and will return: {'message': {'code': {'response': 80}, 'status': {'time': 50}}, 'time': 100}
+
+    Note that the labels of end points cannot also be inner nodes
+
+    See: http://stackoverflow.com/questions/25389875/dot-notation-to-json-in-python
+
+    This function in essence does the following in a compact way:
+    output = {}
+    value = output
+    value = value.setdefault('message',{})
+    value = value.setdefault('code',{})
+    value['status'] = 10
+    print output     # gives: {'message': {'code': {'status': 10}}}
+    """
+    output = {}
+    for key, value in a.iteritems():
+        path = key.split('.')
+        if path[0] == 'json':
+            path = path[1:]
+        target = reduce(lambda d, k: d.setdefault(k, {}), path[:-1], output)
+        target[path[-1]] = value
+    return output
+
 def alert_loggly(alert, metric):
 
     """ Logs a JSON object to Loggly """
@@ -35,12 +63,12 @@ def alert_loggly(alert, metric):
     name = m.group(2)
     value = metric[0]
     msg = {
-        name: value,
         "id": id,
         "matched_substring":alert[0],
         "strategy_used":alert[1],
         "next_alert_in_sec":alert[2],
     }
+    msg.update(dot_to_json({name:value}))
 
     log_data = "PLAINTEXT=" + urllib2.quote(simplejson.dumps(msg))
 
