@@ -200,20 +200,19 @@ class Analyzer(Thread):
             if settings.ENABLE_ALERTS:
                 for alert in settings.ALERTS:
                     for metric in self.anomalous_metrics:
-                        for a in alert[0]:
-                            #logger.info("Checking if %s is in %s" % (a, metric[1]))
-                            if a in metric[1]:
-                                cache_key = 'last_alert.%s.%s' % (alert[1], metric[1])
-                                try:
-                                    last_alert = self.redis_conn.get(cache_key)
-                                    if not last_alert:
-                                        logger.info("Triggering alert %s for metric %s" % (alert,
-                                                                                        metric[1]))
-                                        self.redis_conn.setex(cache_key, alert[2], packb(metric[0]))
-                                        trigger_alert(alert, metric)
+                        if alert[0] in metric[1]:
+                            logger.info("Checking if %s is in %s" % (alert[0], metric[1]))
+                            cache_key = 'last_alert.%s.%s' % (alert[1], metric[1])
+                            try:
+                                last_alert = self.redis_conn.get(cache_key)
+                                if not last_alert:
+                                    logger.info("Triggering alert %s for metric %s" % (alert,
+                                                                                    metric[1]))
+                                    self.redis_conn.setex(cache_key, alert[2], packb(metric[0]))
+                                    trigger_alert(alert, metric)
 
-                                except Exception as e:
-                                    logger.error("couldn't send alert: %s" % e)
+                            except Exception as e:
+                                logger.error("couldn't send alert: %s" % e)
 
             # Write anomalous_metrics to static webapp directory
             filename = path.abspath(path.join(path.dirname(__file__), '..', settings.ANOMALY_DUMP))
