@@ -125,7 +125,7 @@ def alert_hipchat(alert, metric):
     hipster = hipchat.HipChat(token=settings.HIPCHAT_OPTS['auth_token'])
     rooms = settings.HIPCHAT_OPTS['rooms'][alert[0]]
 
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.utcnow().replace(second=0, microsecond=0)
     date_from = now - datetime.timedelta(seconds=50*60)
     date_until = now + datetime.timedelta(seconds=10*60)
 
@@ -133,11 +133,13 @@ def alert_hipchat(alert, metric):
     value = metric[0]
     name = "json.%s" % name
 
-    url_params = urllib2.quote(settings.GRAPH_URL % (
+    url_params = settings.GRAPH_URL % (
                                         id, name,
                                         date_from.isoformat(),
-                                        date_until.isoformat()))
+                                        date_until.isoformat())
     
+    url_params.replace(":","%3A").replace(" ","%20")
+
     link = 'http://' + settings.LOGGLY_HOST + url_params
 
     for room in rooms:
