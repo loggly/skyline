@@ -137,8 +137,8 @@ def alert_hipchat(alert, metric):
                                         id, name,
                                         date_from.isoformat(),
                                         date_until.isoformat())
-    
-    url_params.replace(":","%3A").replace(" ","%20")
+
+    url_params = url_params.replace(":","%3A").replace(" ","%20")
 
     link = 'http://' + settings.LOGGLY_HOST + url_params
 
