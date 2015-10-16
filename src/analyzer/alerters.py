@@ -39,8 +39,11 @@ def alert_loggly(alert, metric):
 
     log_data = "PLAINTEXT=" + urllib2.quote(simplejson.dumps(msg))
 
+    uri = "https://logs-01.loggly.com/inputs/%s/%s/" % (loggly_key, tag)
+    logger.info("Sending to Loggly with\nURI: %s \nand data:%s" % (uri,log_data))
+
     # Send log data to Loggly
-    urllib2.urlopen("https://logs-01.loggly.com/inputs/%s/%s/queryAPI/" % (loggly_key,tag),log_data)
+    urllib2.urlopen(uri, log_data)
 
 
 def alert_smtp(alert, metric):
