@@ -75,22 +75,22 @@ def median_absolute_deviation(timeseries):
     return False
 
 
-def grubbs(timeseries):
-    """
-    A timeseries is anomalous if the Z score is greater than the Grubb's score.
-    """
+#def grubbs(timeseries):
+#    """
+#    A timeseries is anomalous if the Z score is greater than the Grubb's score.
+#    """
 
-    series = scipy.array([x[1] for x in timeseries])
-    stdDev = scipy.std(series)
-    mean = np.mean(series)
-    tail_average = tail_avg(timeseries)
-    z_score = (tail_average - mean) / stdDev
-    len_series = len(series)
-    threshold = scipy.stats.t.isf(.05 / (2 * len_series), len_series - 2)
-    threshold_squared = threshold * threshold
-    grubbs_score = ((len_series - 1) / np.sqrt(len_series)) * np.sqrt(threshold_squared / (len_series - 2 + threshold_squared))
+#    series = scipy.array([x[1] for x in timeseries])
+#    stdDev = scipy.std(series)
+#    mean = np.mean(series)
+#    tail_average = tail_avg(timeseries)
+#    z_score = (tail_average - mean) / stdDev
+#    len_series = len(series)
+#    threshold = scipy.stats.t.isf(.05 / (2 * len_series), len_series - 2)
+#    threshold_squared = threshold * threshold
+#    grubbs_score = ((len_series - 1) / np.sqrt(len_series)) * np.sqrt(threshold_squared / (len_series - 2 + threshold_squared))
 
-    return z_score > grubbs_score
+#    return z_score > grubbs_score
 
 
 def first_hour_average(timeseries):
@@ -206,70 +206,70 @@ def histogram_bins(timeseries):
     return False
 
 
-def ks_test(timeseries):
-    """
-    A timeseries is anomalous if 2 sample Kolmogorov-Smirnov test indicates
-    that data distribution for last 10 minutes is different from last hour.
-    It produces false positives on non-stationary series so Augmented
-    Dickey-Fuller test applied to check for stationarity.
-    """
+#def ks_test(timeseries):
+#    """
+#    A timeseries is anomalous if 2 sample Kolmogorov-Smirnov test indicates
+#    that data distribution for last 10 minutes is different from last hour.
+#    It produces false positives on non-stationary series so Augmented
+#    Dickey-Fuller test applied to check for stationarity.
+#    """
+#
+#    hour_ago = time() - 3600
+#    ten_minutes_ago = time() - 600
+#    reference = scipy.array([x[1] for x in timeseries if x[0] >= hour_ago and x[0] < ten_minutes_ago])
+#    probe = scipy.array([x[1] for x in timeseries if x[0] >= ten_minutes_ago])
 
-    hour_ago = time() - 3600
-    ten_minutes_ago = time() - 600
-    reference = scipy.array([x[1] for x in timeseries if x[0] >= hour_ago and x[0] < ten_minutes_ago])
-    probe = scipy.array([x[1] for x in timeseries if x[0] >= ten_minutes_ago])
+#    if reference.size < 20 or probe.size < 20:
+#        return False
 
-    if reference.size < 20 or probe.size < 20:
-        return False
+#    ks_d, ks_p_value = scipy.stats.ks_2samp(reference, probe)
 
-    ks_d, ks_p_value = scipy.stats.ks_2samp(reference, probe)
+#    if ks_p_value < 0.05 and ks_d > 0.5:
+#        adf = sm.tsa.stattools.adfuller(reference, 10)
+#        if adf[1] < 0.05:
+#            return True
 
-    if ks_p_value < 0.05 and ks_d > 0.5:
-        adf = sm.tsa.stattools.adfuller(reference, 10)
-        if adf[1] < 0.05:
-            return True
-
-    return False
+#    return False
 
 
-def is_anomalously_anomalous(metric_name, ensemble, datapoint):
-    """
-    This method runs a meta-analysis on the metric to determine whether the
-    metric has a past history of triggering. TODO: weight intervals based on datapoint
-    """
-    # We want the datapoint to avoid triggering twice on the same data
-    new_trigger = [time(), datapoint]
+#def is_anomalously_anomalous(metric_name, ensemble, datapoint):
+#    """
+#    This method runs a meta-analysis on the metric to determine whether the
+#    metric has a past history of triggering. TODO: weight intervals based on datapoint
+#    """
+#    # We want the datapoint to avoid triggering twice on the same data
+#    new_trigger = [time(), datapoint]
 
-    # Get the old history
-    raw_trigger_history = redis_conn.get('trigger_history.' + metric_name)
-    if not raw_trigger_history:
-        redis_conn.set('trigger_history.' + metric_name, packb([(time(), datapoint)]))
-        return True
+#    # Get the old history
+#    raw_trigger_history = redis_conn.get('trigger_history.' + metric_name)
+#    if not raw_trigger_history:
+#        redis_conn.set('trigger_history.' + metric_name, packb([(time(), datapoint)]))
+#        return True
 
-    trigger_history = unpackb(raw_trigger_history)
+#    trigger_history = unpackb(raw_trigger_history)
 
-    # Are we (probably) triggering on the same data?
-    if (new_trigger[1] == trigger_history[-1][1] and
-            new_trigger[0] - trigger_history[-1][0] <= 300):
-                return False
+#    # Are we (probably) triggering on the same data?
+#    if (new_trigger[1] == trigger_history[-1][1] and
+#            new_trigger[0] - trigger_history[-1][0] <= 300):
+#                return False
 
-    # Update the history
-    trigger_history.append(new_trigger)
-    redis_conn.set('trigger_history.' + metric_name, packb(trigger_history))
+#    # Update the history
+#    trigger_history.append(new_trigger)
+#    redis_conn.set('trigger_history.' + metric_name, packb(trigger_history))
 
-    # Should we surface the anomaly?
-    trigger_times = [x[0] for x in trigger_history]
-    intervals = [
-        trigger_times[i + 1] - trigger_times[i]
-        for i, v in enumerate(trigger_times)
-        if (i + 1) < len(trigger_times)
-    ]
+#    # Should we surface the anomaly?
+#    trigger_times = [x[0] for x in trigger_history]
+#    intervals = [
+#        trigger_times[i + 1] - trigger_times[i]
+#        for i, v in enumerate(trigger_times)
+#        if (i + 1) < len(trigger_times)
+#    ]
 
-    series = pandas.Series(intervals)
-    mean = series.mean()
-    stdDev = series.std()
+#    series = pandas.Series(intervals)
+#    mean = series.mean()
+#    stdDev = series.std()
 
-    return abs(intervals[-1] - mean) > 3 * stdDev
+#    return abs(intervals[-1] - mean) > 3 * stdDev
 
 
 def run_selected_algorithm(timeseries, metric_name):
@@ -294,11 +294,11 @@ def run_selected_algorithm(timeseries, metric_name):
 
         threshold = len(ensemble) - CONSENSUS
         if ensemble.count(False) <= threshold:
-            if ENABLE_SECOND_ORDER:
-                if is_anomalously_anomalous(metric_name, ensemble, timeseries[-1][1]):
-                    return True, ensemble, timeseries[-1][1], threshold
-            else:
-                return True, ensemble, timeseries[-1][1], threshold
+#           if ENABLE_SECOND_ORDER:
+#                if is_anomalously_anomalous(metric_name, ensemble, timeseries[-1][1]):
+#                    return True, ensemble, timeseries[-1][1], threshold
+#            else:
+            return True, ensemble, timeseries[-1][1], threshold
 
         return False, ensemble, timeseries[-1][1], threshold
 
